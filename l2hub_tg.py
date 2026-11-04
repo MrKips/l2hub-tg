@@ -258,6 +258,12 @@ def watch_bridge(state: dict) -> None:
 WHO = {"selaquik": "Сергей", "kraffty": "Кирилл", "MrKips": "Илья"}
 DIGEST_TZ = timezone(timedelta(hours=5))  # Ташкент
 DIGEST_HOUR = int(os.environ.get("DIGEST_HOUR", "20"))
+
+
+def digest_day() -> datetime:
+    """День последней сводки: до DIGEST_HOUR это ещё вчерашняя (её догоняем, если Actions проспал вечер)."""
+    now = datetime.now(DIGEST_TZ)
+    return now if now.hour >= DIGEST_HOUR else now - timedelta(days=1)
 VERSION_RE = re.compile(r"v?\d+\.\d+\.\d+$")
 
 
@@ -298,7 +304,8 @@ def post_digest(state: dict) -> None:
     prev = state.get("digest", {})
     new_released = [n for n in now["released"] if n not in prev.get("released", [])] if prev else []
     new_done = [n for n in now["done"] if n not in prev.get("done", [])] if prev else []
-    lines = [f"📋 <b>Сводка по мосту</b> · {datetime.now(DIGEST_TZ):%d.%m} · сборка {esc(latest)}"]
+    day = digest_day()
+    lines = [f"📋 <b>Сводка по мосту</b> · {day:%d.%m} · сборка {esc(latest)}"]
     if new_released:
         lines += ["", "🆕 <b>Вошло в сборку</b> (своё можно убирать из модулей):", *(task_line(n, tasks[n]) for n in new_released)]
     if now["accepted"]:
@@ -314,14 +321,13 @@ def post_digest(state: dict) -> None:
     if not now["released"] and not now["accepted"]:
         lines += ["", "<i>Строку release: в задачах пока никто не пишет — «в сборке» и «принято» появятся, когда начнут.</i>"]
     post("SYSTEM", "\n".join(lines))
-    state["digest"] = {"day": f"{datetime.now(DIGEST_TZ):%Y-%m-%d}", "released": now["released"], "done": now["done"]}
+    state["digest"] = {"day": f"{day:%Y-%m-%d}", "released": now["released"], "done": now["done"]}
     save_state(state)
 
 
 def maybe_digest(state: dict) -> None:
-    """Раз в день, после DIGEST_HOUR по Ташкенту (Actions ходит раз в полчаса)."""
-    now = datetime.now(DIGEST_TZ)
-    if now.hour >= DIGEST_HOUR and state.get("digest", {}).get("day") != f"{now:%Y-%m-%d}":
+    """Раз в день, после DIGEST_HOUR по Ташкенту; пропущенную вечером — первым же запуском после."""
+    if state.get("digest", {}).get("day", "") < f"{digest_day():%Y-%m-%d}":
         post_digest(state)
 
 
