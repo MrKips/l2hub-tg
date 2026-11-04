@@ -5,7 +5,8 @@
 отсюда, командой outbox. Что уже отправлено, помнит state/seen.json (Actions коммитит его обратно).
 
 Режимы:
-  python l2hub_tg.py watch [--dry-run]   — релизы L2Hub и мост (это и запускает Actions)
+  python l2hub_tg.py watch [--dry-run]   — релизы L2Hub, мост и раз в день сводка (это и запускает Actions)
+  python l2hub_tg.py digest [--dry-run]  — сводка по мосту прямо сейчас
   python l2hub_tg.py outbox [--dry-run]  — выложить наработки из outbox/ в «Наработки» (локально)
   python l2hub_tg.py init                 — запомнить текущее состояние без публикаций (первый запуск)
   python l2hub_tg.py topics               — показать id тем группы, которые бот видел (для .env)
@@ -20,7 +21,7 @@ import re
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -252,6 +253,78 @@ def watch_bridge(state: dict) -> None:
     save_state(state)
 
 
+# ---------- Сводка по мосту ----------
+
+WHO = {"selaquik": "Сергей", "kraffty": "Кирилл", "MrKips": "MrKips"}
+DIGEST_TZ = timezone(timedelta(hours=5))  # Ташкент
+DIGEST_HOUR = int(os.environ.get("DIGEST_HOUR", "20"))
+VERSION_RE = re.compile(r"v?\d+\.\d+\.\d+$")
+
+
+def bridge_tasks() -> dict[str, dict]:
+    tasks = {}
+    for path in sorted((BRIDGE_DIR / "tasks").glob("*.md")):
+        fields = front(path.read_text("utf-8"))
+        fields.setdefault("title", path.stem)
+        tasks[path.stem] = fields
+    return tasks
+
+
+def digest_buckets(tasks: dict, latest: str) -> dict[str, list[str]]:
+    """Четыре корзины: в сборке, принято (выйдет позже), в работе, сделано и ждёт приёмки.
+    «В сборке» и «принято» — только по строке release: в шапке задачи, без догадок по тексту."""
+    out = {"released": [], "accepted": [], "work": [], "done": []}
+    for name, t in tasks.items():
+        release = t.get("release", "").strip()
+        if VERSION_RE.match(release):
+            out["released" if version_key(release) <= version_key(latest) else "accepted"].append(name)
+        elif t.get("status") == "в работе":
+            out["work"].append(name)
+        elif t.get("status") == "готово":
+            out["done"].append(name)
+    return out
+
+
+def task_line(name: str, t: dict) -> str:
+    who = WHO.get(t.get("who", ""), t.get("who", "—"))
+    release = t.get("release", "").strip()
+    return f"• {esc(t['title'])} — {esc(who)}" + (f" ({esc(release)})" if VERSION_RE.match(release) else "") + f" <a href=\"{BRIDGE_WEB}/tasks/{name}.md\">›</a>"
+
+
+def post_digest(state: dict) -> None:
+    tasks = bridge_tasks()
+    latest = release_tags()[-1]
+    now = digest_buckets(tasks, latest)
+    prev = state.get("digest", {})
+    new_released = [n for n in now["released"] if n not in prev.get("released", [])] if prev else []
+    new_done = [n for n in now["done"] if n not in prev.get("done", [])] if prev else []
+    lines = [f"📋 <b>Сводка по мосту</b> · {datetime.now(DIGEST_TZ):%d.%m} · сборка {esc(latest)}"]
+    if new_released:
+        lines += ["", "🆕 <b>Вошло в сборку</b> (своё можно убирать из модулей):", *(task_line(n, tasks[n]) for n in new_released)]
+    if now["accepted"]:
+        lines += ["", "✅ <b>Принято, выйдет позже:</b>", *(task_line(n, tasks[n]) for n in now["accepted"])]
+    if now["work"]:
+        lines += ["", "🔨 <b>В работе:</b>", *(task_line(n, tasks[n]) for n in now["work"])]
+    per = {}
+    for n in now["done"]:
+        who = WHO.get(tasks[n].get("who", ""), tasks[n].get("who", "—"))
+        per[who] = per.get(who, 0) + 1
+    lines += ["", f"📦 <b>Готово, версия не указана:</b> {len(now['done'])}" + (" (" + ", ".join(f"{esc(w)} {c}" for w, c in per.items()) + ")" if per else "")]
+    lines += [task_line(n, tasks[n]) for n in new_done]
+    if not now["released"] and not now["accepted"]:
+        lines += ["", "<i>Строку release: в задачах пока никто не пишет — «в сборке» и «принято» появятся, когда начнут.</i>"]
+    post("SYSTEM", "\n".join(lines))
+    state["digest"] = {"day": f"{datetime.now(DIGEST_TZ):%Y-%m-%d}", "released": now["released"], "done": now["done"]}
+    save_state(state)
+
+
+def maybe_digest(state: dict) -> None:
+    """Раз в день, после DIGEST_HOUR по Ташкенту (Actions ходит раз в полчаса)."""
+    now = datetime.now(DIGEST_TZ)
+    if now.hour >= DIGEST_HOUR and state.get("digest", {}).get("day") != f"{now:%Y-%m-%d}":
+        post_digest(state)
+
+
 # ---------- Наработки (outbox) ----------
 
 def watch_outbox() -> None:
@@ -295,7 +368,7 @@ def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     load_dotenv()
     parser = argparse.ArgumentParser(description="Бот группы L2Hub в Telegram")
-    parser.add_argument("mode", choices=["watch", "outbox", "init", "topics"])
+    parser.add_argument("mode", choices=["watch", "digest", "outbox", "init", "topics"])
     parser.add_argument("--dry-run", action="store_true", help="ничего не отправлять, показать в журнале")
     args = parser.parse_args()
     DRY = args.dry_run
@@ -312,8 +385,11 @@ def main() -> None:
     if args.mode == "outbox":
         watch_outbox()
         return
+    if args.mode == "digest":
+        post_digest(state)
+        return
     failed = False
-    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state))):
+    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state)), ("сводка", lambda: maybe_digest(state))):
         try:
             step()
         except Exception as exc:  # одна сломанная часть не мешает остальным
