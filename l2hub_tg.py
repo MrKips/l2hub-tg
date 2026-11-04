@@ -255,7 +255,7 @@ def watch_bridge(state: dict) -> None:
 
 # ---------- Сводка по мосту ----------
 
-WHO = {"selaquik": "Сергей", "kraffty": "Кирилл", "MrKips": "MrKips"}
+WHO = {"selaquik": "Сергей", "kraffty": "Кирилл", "MrKips": "Илья"}
 DIGEST_TZ = timezone(timedelta(hours=5))  # Ташкент
 DIGEST_HOUR = int(os.environ.get("DIGEST_HOUR", "20"))
 VERSION_RE = re.compile(r"v?\d+\.\d+\.\d+$")
