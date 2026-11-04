@@ -31,7 +31,7 @@ jobs:
           BRIDGE_DEPLOY_KEY: ${{ secrets.BRIDGE_DEPLOY_KEY }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$BRIDGE_DEPLOY_KEY" > ~/.ssh/bridge
+          printf '%s\n' "$BRIDGE_DEPLOY_KEY" | tr -d '\r' > ~/.ssh/bridge  # секрет, заданный с Windows, приходит с CRLF
           chmod 600 ~/.ssh/bridge
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/bridge -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           git clone -q git@github.com:kraffty4/L2Hub-bridge.git "$RUNNER_TEMP/bridge"
