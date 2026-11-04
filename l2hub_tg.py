@@ -1,15 +1,17 @@
 """Бот группы L2Hub в Telegram: сам сообщает о новых версиях L2Hub, о событиях моста и выкладывает наработки.
 
-Работает на компьютере по расписанию (Планировщик Windows, раз в 10 минут), а не в облаке: мост закрытый,
-и git на этой машине уже вошёл в GitHub, а архивы для Кирилла появляются здесь же, в папке outbox.
-Что уже отправлено, помнит state/seen.json — выключенный компьютер ничего не теряет, а повторов нет.
+Релизы и мост проверяет GitHub Actions раз в полчаса (.github/workflows/bot.yml): мост клонируется
+по deploy key только на чтение. Архивы для Кирилла появляются на компьютере, поэтому outbox выкладывается
+отсюда, командой outbox. Что уже отправлено, помнит state/seen.json (Actions коммитит его обратно).
 
 Режимы:
-  python l2hub_tg.py watch [--dry-run]   — релизы L2Hub, мост, outbox (это и запускает Планировщик)
+  python l2hub_tg.py watch [--dry-run]   — релизы L2Hub и мост (это и запускает Actions)
+  python l2hub_tg.py outbox [--dry-run]  — выложить наработки из outbox/ в «Наработки» (локально)
   python l2hub_tg.py init                 — запомнить текущее состояние без публикаций (первый запуск)
   python l2hub_tg.py topics               — показать id тем группы, которые бот видел (для .env)
 
-Ключи — в .env рядом со скриптом (в git не попадает): TELEGRAM_BOT_TOKEN, LLM_API_KEY, TG_CHAT_ID и id тем.
+Ключи — в .env рядом со скриптом (в git не попадает) или в секретах репозитория: TELEGRAM_BOT_TOKEN,
+LLM_API_KEY, TG_CHAT_ID и id тем; в Actions ещё BRIDGE_DEPLOY_KEY.
 """
 import argparse
 import json
@@ -293,7 +295,7 @@ def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     load_dotenv()
     parser = argparse.ArgumentParser(description="Бот группы L2Hub в Telegram")
-    parser.add_argument("mode", choices=["watch", "init", "topics"])
+    parser.add_argument("mode", choices=["watch", "outbox", "init", "topics"])
     parser.add_argument("--dry-run", action="store_true", help="ничего не отправлять, показать в журнале")
     args = parser.parse_args()
     DRY = args.dry_run
@@ -307,11 +309,18 @@ def main() -> None:
         save_state(state)
         log("запомнил:", state)
         return
-    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state)), ("наработки", watch_outbox)):
+    if args.mode == "outbox":
+        watch_outbox()
+        return
+    failed = False
+    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state))):
         try:
             step()
         except Exception as exc:  # одна сломанная часть не мешает остальным
             log(f"{name}: ошибка: {exc}")
+            failed = True
+    if failed:
+        sys.exit(1)  # красный прогон в Actions — GitHub пришлёт письмо
 
 
 if __name__ == "__main__":

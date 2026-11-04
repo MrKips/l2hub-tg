@@ -1,0 +1,56 @@
+name: bot
+
+# Раз в полчаса: новые версии L2Hub → «Обновления», изменения моста → «Система».
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # коммит state/seen.json
+
+concurrency:
+  group: bot
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -q -r requirements.txt
+
+      - name: Клон моста (deploy key только на чтение)
+        env:
+          BRIDGE_DEPLOY_KEY: ${{ secrets.BRIDGE_DEPLOY_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$BRIDGE_DEPLOY_KEY" > ~/.ssh/bridge
+          chmod 600 ~/.ssh/bridge
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/bridge -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          git clone -q git@github.com:kraffty4/L2Hub-bridge.git "$RUNNER_TEMP/bridge"
+          git -C "$RUNNER_TEMP/bridge" config core.sshCommand "$GIT_SSH_COMMAND"
+
+      - name: Бот
+        env:
+          BRIDGE_DIR: ${{ runner.temp }}/bridge
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_TOPIC_UPDATES: ${{ secrets.TG_TOPIC_UPDATES }}
+          TG_TOPIC_SYSTEM: ${{ secrets.TG_TOPIC_SYSTEM }}
+        run: python l2hub_tg.py watch
+
+      - name: Запомнить отправленное
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/seen.json
+          git diff --cached --quiet || { git commit -q -m "state: отправлено ботом" && git push -q; }
