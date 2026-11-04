@@ -334,10 +334,10 @@ def watch_outbox() -> None:
         archive = md.with_suffix(".zip")
         text = md.read_text("utf-8").strip()
         if archive.exists():
-            caption = text.split("\n\n")[0][:900]
-            post_file("WORK", archive, esc(caption))
-            if len(text) > len(caption):
-                post("WORK", esc(text))
+            first, _, rest = text.partition("\n\n")
+            post_file("WORK", archive, esc(first[:900]))
+            if rest.strip():  # остальное — отдельным сообщением, без повтора подписи
+                post("WORK", esc(rest.strip()))
         else:
             post("WORK", esc(text))
         if not DRY:
