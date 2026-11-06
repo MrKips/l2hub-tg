@@ -26,6 +26,8 @@ from pathlib import Path
 
 import requests
 
+from telegram_html import split_html
+
 ROOT = Path(__file__).resolve().parent
 STATE = ROOT / "state" / "seen.json"
 OUTBOX = ROOT / "outbox"
@@ -88,25 +90,24 @@ def tg(method: str, data: dict, files: dict | None = None) -> dict:
 
 
 def post(where: str, text: str) -> None:
-    """Сообщение в тему группы. HTML-разметка Telegram; длинное — обрезается."""
-    if len(text) > TG_LIMIT:
-        text = text[:TG_LIMIT - 1] + "…"
-    if DRY:
-        log(f"[пробно → {where}]\n{text}\n")
-        return
-    data = {"chat_id": os.environ["TG_CHAT_ID"], "text": text, "parse_mode": "HTML", "disable_web_page_preview": "true"}
-    thread = topic(where)
-    if thread:
-        data["message_thread_id"] = thread
-    tg("sendMessage", data)
-    time.sleep(1.5)  # Telegram не любит пачки сообщений в одну группу
+    """Сообщение в тему группы; длинное делится с сохранением HTML и всего текста."""
+    for chunk in split_html(text, TG_LIMIT):
+        if DRY:
+            log(f"[пробно → {where}]\n{chunk}\n")
+            continue
+        data = {"chat_id": os.environ["TG_CHAT_ID"], "text": chunk, "parse_mode": "HTML", "disable_web_page_preview": "true"}
+        thread = topic(where)
+        if thread:
+            data["message_thread_id"] = thread
+        tg("sendMessage", data)
+        time.sleep(1.5)  # Telegram не любит пачки сообщений в одну группу
 
 
 def post_file(where: str, path: Path, caption: str) -> None:
     if DRY:
         log(f"[пробно → {where}] файл {path.name} ({path.stat().st_size // 1024} КБ)\n{caption}\n")
         return
-    data = {"chat_id": os.environ["TG_CHAT_ID"], "caption": caption[:1000], "parse_mode": "HTML"}
+    data = {"chat_id": os.environ["TG_CHAT_ID"], "caption": split_html(caption, 1000)[0], "parse_mode": "HTML"}
     thread = topic(where)
     if thread:
         data["message_thread_id"] = thread

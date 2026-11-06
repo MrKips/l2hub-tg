@@ -27,6 +27,9 @@ jobs:
 
       - run: pip install -q -r requirements.txt
 
+      - name: Проверка сообщений без отправки
+        run: python -m unittest -v
+
       - name: Клон моста (deploy key только на чтение)
         env:
           BRIDGE_DEPLOY_KEY: ${{ secrets.BRIDGE_DEPLOY_KEY }}
