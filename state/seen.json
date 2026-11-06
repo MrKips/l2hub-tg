@@ -2,7 +2,7 @@
  "release": "v0.5.205",
  "bridge": "477d8e6c74da224604a7bb6e88ed9b118ac4bfe9",
  "digest": {
-  "day": "2026-11-04",
+  "day": "2026-11-06",
   "released": [
    "board-karma",
    "board-raid-status",
@@ -12,6 +12,7 @@
    "clan-priority",
    "clan-savings",
    "debuff-removal",
+   "ep-macro-hotbar-existing-characters",
    "ep-olympiad-cancel-registration-race",
    "gm-shop-editor",
    "hunter-craft",
@@ -23,6 +24,7 @@
    "hunter-spoil",
    "hunters-500",
    "machine-estimate",
+   "mode-x10",
    "noblesse",
    "restart-reminder",
    "russian-dialogs",
@@ -30,6 +32,7 @@
    "store-close"
   ],
   "done": [
+   "ep-autolearn-skill-level-downgrade",
    "ep-chat-bank-terra-v119-integration",
    "ep-clan-recruitment-after-dismissal-penalty",
    "ep-class-kits",
@@ -56,21 +59,32 @@
    "ep-local-h06",
    "ep-local-h09",
    "ep-local-h10",
+   "ep-native-source",
    "ep-olympiad-arena1-navigation",
+   "ep-olympiad-aura-self-defence-omitted",
    "ep-olympiad-continuous",
    "ep-olympiad-countdowns",
+   "ep-olympiad-delays-between-actions",
+   "ep-olympiad-disconnect-fight-history",
+   "ep-olympiad-first-action-delay",
    "ep-olympiad-gates-stay-closed",
+   "ep-olympiad-last-points-cursor",
+   "ep-olympiad-learned-self-heals-omitted",
    "ep-olympiad-mage-participation-audit",
    "ep-olympiad-next-cycle-midnight",
    "ep-olympiad-opponent-class",
+   "ep-olympiad-positive-hp-knockout",
    "ep-olympiad-pregame-movement",
+   "ep-olympiad-relog-current-player",
+   "ep-olympiad-repeated-pvp-chat",
    "ep-olympiad-servitor-idle",
    "ep-olympiad-sitting-fake-death",
+   "ep-olympiad-solo-party-heal-conditionally-omitted",
    "ep-olympiad-token-reward-scale",
    "ep-paid-carry-weight",
    "ep-party-noblesse",
    "ep-previous-delivery",
-   "mode-x10"
+   "ep-source-handoff-20261105"
   ]
  }
 }
