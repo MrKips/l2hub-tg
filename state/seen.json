@@ -1,6 +1,6 @@
 {
  "release": "v0.5.238",
- "bridge": "f9e319cf178f5fcdb81c396899538af744362db1",
+ "bridge": "0cbaf4e503ac48ada91f6cc2646d2734c90587e3",
  "digest": {
   "day": "2026-11-07",
   "released": [
@@ -110,23 +110,23 @@
    "work": [
     {
      "id": 1280,
-     "hash": "7c6abe28aee67f8539ec90589b2d99ebea75123b426b801f6b10ac8e0cbdcc04"
+     "hash": "ac60a64cba710902edf2dd22c61080abdfa9a5af365cab2d03d74a7dae9550f4"
     }
    ],
    "plan": [
     {
      "id": 1281,
-     "hash": "3e6ff6a69c2d2eee5fe5e636834d1b7d2ee6084c5320f49131bad3410971c3fd"
+     "hash": "d09f41708a1141dcd4a808f30522071f7268464c35d404af5e7ee4dd278f49fa"
     }
    ],
    "local": [
     {
      "id": 1282,
-     "hash": "5762d2f0ca41bc9c740e8c2666d54b776ff7734fe53042255636163e3c197e5f"
+     "hash": "c2ee35df0bb0cc7123f501d140891eb61ee81c9a35cd8cbbc69ccb9f045f42c6"
     },
     {
      "id": 1283,
-     "hash": "a9d57f51cebf66c6db2a101a5f7072ce71bd24e3272b92880f70b3898cfff57f"
+     "hash": "6982b5f48a5144122b43901cbfc26b60e7ea0c3448fb096f77370205d25b4a08"
     }
    ],
    "accepted": [
@@ -150,17 +150,17 @@
    "attention": [
     {
      "id": 1287,
-     "hash": "d0dbe329c4acdc14b30d64e7e0eeb18c6e2e2c1bc7efb4b2f3940263613af640"
+     "hash": "05040079ada43f1eb0efe7b0556147c416939cd37b4d59e955e50e8697953800"
     }
    ],
    "index": [
     {
      "id": 1288,
-     "hash": "c7d9dc664ca17263bfadc3f80c0812d8cfb2e11c27d765870d43f6009031c336"
+     "hash": "b4e9e01c3fe54c0f33eb7109f031ae3c616f73fb98b1d6a57ff716f37db318db"
     }
    ]
   },
-  "tasks_tree": "a74ad84cec42f5eb545d62b99c1fa9c1668fbfbd",
+  "tasks_tree": "08e768da2d8df25e41c35977346904cc4ddf6fe0",
   "release": "v0.5.238",
   "view_version": 1
  }
