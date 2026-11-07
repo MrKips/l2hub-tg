@@ -1,8 +1,8 @@
 {
  "release": "v0.5.238",
- "bridge": "3dc512ef68426deaf89218074f3fd6c3d0edef4c",
+ "bridge": "f9e319cf178f5fcdb81c396899538af744362db1",
  "digest": {
-  "day": "2026-11-06",
+  "day": "2026-11-07",
   "released": [
    "board-karma",
    "board-raid-status",
@@ -12,12 +12,18 @@
    "clan-priority",
    "clan-savings",
    "debuff-removal",
+   "ep-class-kits",
+   "ep-hunter-price-parity",
    "ep-macro-hotbar-existing-characters",
    "ep-olympiad-cancel-registration-race",
+   "ep-olympiad-disconnect-fight-history",
+   "ep-olympiad-last-points-cursor",
+   "ep-olympiad-positive-hp-knockout",
    "gm-shop-editor",
    "hunter-craft",
    "hunter-kamaloka",
    "hunter-learning",
+   "hunter-mentors",
    "hunter-party-matching",
    "hunter-pets",
    "hunter-rift",
@@ -26,6 +32,7 @@
    "machine-estimate",
    "mode-x10",
    "noblesse",
+   "rename-hunters-to-pawns",
    "restart-reminder",
    "russian-dialogs",
    "shop-price-stubs",
@@ -33,13 +40,16 @@
   ],
   "done": [
    "ep-autolearn-skill-level-downgrade",
+   "ep-chat-bank-runtime",
    "ep-chat-bank-terra-v119-integration",
    "ep-clan-recruitment-after-dismissal-penalty",
-   "ep-class-kits",
+   "ep-clan-war-personal-companion-targets",
+   "ep-cross-clan-applications",
    "ep-enchant",
    "ep-gmshop-icarus-pvp-370-col",
+   "ep-gmshop-noblesse-reagents",
    "ep-gmshop-pvp-armor-cheaper-than-base",
-   "ep-hunter-price-parity",
+   "ep-gmshop-soul-bottles",
    "ep-latest-local-package",
    "ep-local-b06",
    "ep-local-b07",
@@ -65,15 +75,12 @@
    "ep-olympiad-continuous",
    "ep-olympiad-countdowns",
    "ep-olympiad-delays-between-actions",
-   "ep-olympiad-disconnect-fight-history",
    "ep-olympiad-first-action-delay",
    "ep-olympiad-gates-stay-closed",
-   "ep-olympiad-last-points-cursor",
    "ep-olympiad-learned-self-heals-omitted",
    "ep-olympiad-mage-participation-audit",
    "ep-olympiad-next-cycle-midnight",
    "ep-olympiad-opponent-class",
-   "ep-olympiad-positive-hp-knockout",
    "ep-olympiad-pregame-movement",
    "ep-olympiad-relog-current-player",
    "ep-olympiad-repeated-pvp-chat",
@@ -83,8 +90,18 @@
    "ep-olympiad-token-reward-scale",
    "ep-paid-carry-weight",
    "ep-party-noblesse",
+   "ep-pawn-mp-prechecks",
+   "ep-pawn-spot-overflow",
+   "ep-personal-archer-support",
+   "ep-personal-real-target",
+   "ep-personal-skill-reagents",
+   "ep-player-auto-enchant",
+   "ep-player-auto-life-stones",
    "ep-previous-delivery",
-   "ep-source-handoff-20261105"
+   "ep-shortcut-autoshot-state",
+   "ep-source-handoff-20261105",
+   "ep-titles",
+   "x10-hub-controls"
   ]
  },
  "plans": {
@@ -93,7 +110,7 @@
    "work": [
     {
      "id": 1280,
-     "hash": "ee58d1f66634fdaf374d22c7f908e68a731ae3572fa21d58b4e461644398f0d8"
+     "hash": "7c6abe28aee67f8539ec90589b2d99ebea75123b426b801f6b10ac8e0cbdcc04"
     }
    ],
    "plan": [
@@ -115,7 +132,7 @@
    "accepted": [
     {
      "id": 1284,
-     "hash": "7e0da1bc2f1fb571bfa498d89824222a5aec27ae4479e61d0b23d07b5dcd0d06"
+     "hash": "f110c4a4816417e89cf384dca66e19c19bda75039456a0738d2e5f54a2938702"
     }
    ],
    "released": [
@@ -139,11 +156,11 @@
    "index": [
     {
      "id": 1288,
-     "hash": "97c20354e4e34202ec3f537ffdd9cd9328cdc0db41e44ce2b64d610bc8515158"
+     "hash": "c7d9dc664ca17263bfadc3f80c0812d8cfb2e11c27d765870d43f6009031c336"
     }
    ]
   },
-  "tasks_tree": "180ea35d6fcdae298559d2e8109a7e877a71566b",
+  "tasks_tree": "a74ad84cec42f5eb545d62b99c1fa9c1668fbfbd",
   "release": "v0.5.238",
   "view_version": 1
  }
