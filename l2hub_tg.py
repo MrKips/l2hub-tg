@@ -15,6 +15,7 @@
 LLM_API_KEY, TG_CHAT_ID и id тем; в Actions ещё BRIDGE_DEPLOY_KEY.
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -41,6 +42,8 @@ BRIDGE_WEB = "https://github.com/kraffty4/L2Hub-bridge/blob/main"
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://api.deepseek.com").rstrip("/")
 LLM_MODEL = os.environ.get("LLM_MODEL", "deepseek-flash")
 TG_LIMIT = 3900
+TG_SEND_INTERVAL = 3.2  # менее 20 сообщений в минуту на всю группу, включая разные темы
+TG_RATE_RETRIES = 3
 DRY = False
 
 
@@ -82,11 +85,21 @@ def tg(method: str, data: dict, files: dict | None = None) -> dict:
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
     if not token:
         raise RuntimeError("нет TELEGRAM_BOT_TOKEN в .env")
-    r = requests.post(f"https://api.telegram.org/bot{token}/{method}", data=data, files=files, timeout=60)
-    body = r.json()
-    if not body.get("ok"):
+    streams = [item[1] if isinstance(item, tuple) else item for item in (files or {}).values()]
+    positions = [(stream, stream.tell()) for stream in streams]
+    for attempt in range(TG_RATE_RETRIES + 1):
+        r = requests.post(f"https://api.telegram.org/bot{token}/{method}", data=data, files=files, timeout=60)
+        body = r.json()
+        if body.get("ok"):
+            return body["result"]
+        if (body.get("error_code") == 429 or r.status_code == 429) and attempt < TG_RATE_RETRIES:
+            delay = max(1, int((body.get("parameters") or {}).get("retry_after", 1))) + 1
+            log(f"Telegram: ограничение частоты, жду {delay} с и повторяю отклонённый запрос")
+            time.sleep(delay)
+            for stream, position in positions:
+                stream.seek(position)
+            continue
         raise RuntimeError(f"Telegram {method}: {body.get('description')}")
-    return body["result"]
 
 
 def post(where: str, text: str) -> None:
@@ -100,7 +113,7 @@ def post(where: str, text: str) -> None:
         if thread:
             data["message_thread_id"] = thread
         tg("sendMessage", data)
-        time.sleep(1.5)  # Telegram не любит пачки сообщений в одну группу
+        time.sleep(TG_SEND_INTERVAL)
 
 
 def post_file(where: str, path: Path, caption: str) -> None:
@@ -113,7 +126,7 @@ def post_file(where: str, path: Path, caption: str) -> None:
         data["message_thread_id"] = thread
     with path.open("rb") as f:
         tg("sendDocument", data, files={"document": (path.name, f)})
-    time.sleep(1.5)
+    time.sleep(TG_SEND_INTERVAL)
 
 
 def esc(text: str) -> str:
@@ -246,11 +259,21 @@ def watch_bridge(state: dict) -> None:
             elif (old.get("status"), old.get("who")) != (new.get("status"), new.get("who")):
                 tasks.append(f"🔁 <b>{esc(name)}</b>: {esc(old.get('status', '?'))} → {esc(new.get('status', '?'))}"
                              + (f" ({esc(new.get('who'))})" if new.get("who") not in (None, "—") else ""))
-    for text in news:
+    def deliver(text: str) -> None:
+        # Сохраняем каждую принятую новость: после сбоя продолжаем, а не повторяем всю пачку.
+        key = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        if key in state.get("bridge_sent", []):
+            return
         post("SYSTEM", text)
+        state.setdefault("bridge_sent", []).append(key)
+        save_state(state)
+
+    for text in news:
+        deliver(text)
     if tasks:
-        post("SYSTEM", f"🔧 Мост{(' · ' + esc(who)) if who else ''}:\n" + "\n".join(tasks[:25]) + (f"\n…и ещё {len(tasks) - 25}" if len(tasks) > 25 else ""))
+        deliver(f"🔧 Мост{(' · ' + esc(who)) if who else ''}:\n" + "\n".join(tasks[:25]) + (f"\n…и ещё {len(tasks) - 25}" if len(tasks) > 25 else ""))
     state["bridge"] = head
+    state.pop("bridge_sent", None)
     save_state(state)
 
 
