@@ -49,6 +49,7 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           TG_TOPIC_UPDATES: ${{ secrets.TG_TOPIC_UPDATES }}
           TG_TOPIC_SYSTEM: ${{ secrets.TG_TOPIC_SYSTEM }}
+          TG_TOPIC_PLANS: ${{ secrets.TG_TOPIC_PLANS }}
         run: python l2hub_tg.py watch
 
       - name: Запомнить отправленное

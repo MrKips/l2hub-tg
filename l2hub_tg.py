@@ -29,6 +29,7 @@ import requests
 
 from telegram_html import split_html
 from system_text import describe
+import coordination
 
 ROOT = Path(__file__).resolve().parent
 STATE = ROOT / "state" / "seen.json"
@@ -402,6 +403,79 @@ def maybe_digest(state: dict) -> None:
         post_digest(state)
 
 
+# ---------- Общие планы (не меняют карточки моста) ----------
+
+def plans_link(thread: int, message: int) -> str:
+    chat = os.environ["TG_CHAT_ID"]
+    if not chat.startswith("-100"):
+        raise RuntimeError("Обзор планов требует супергруппу Telegram")
+    return f"https://t.me/c/{chat[4:]}/{thread}/{message}"
+
+
+def sync_plans(state: dict) -> None:
+    thread = topic("PLANS")
+    if not thread:
+        return
+    cards, source = coordination.read_snapshot(BRIDGE_DIR)
+    latest = state.get("release", "")
+    route = hashlib.sha256(f"{os.environ['TG_CHAT_ID']}:{thread}".encode()).hexdigest()
+    current = state.get("plans", {})
+    if (current.get("route") == route and current.get("tasks_tree") == source["tasks_tree"]
+            and current.get("release") == latest and current.get("view_version") == coordination.VIEW_VERSION):
+        return
+    data = coordination.report(cards, source, latest)
+    parts = coordination.sections(data)
+    if DRY:
+        for _, text in parts:
+            post("PLANS", text)
+        log("[пробно → PLANS] обзор будет обновлён без повторной рассылки неизменившихся разделов")
+        return
+    if current.get("route") != route:
+        current = {"route": route, "pages": {}}
+        state["plans"] = current
+
+    def update(key: str, number: int, text: str) -> int:
+        pages = current["pages"].setdefault(key, [])
+        while len(pages) <= number:
+            pages.append({})
+        page = pages[number]
+        checksum = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        if page.get("id") and page.get("hash") == checksum:
+            return page["id"]
+        payload = {"chat_id": os.environ["TG_CHAT_ID"], "text": text, "parse_mode": "HTML", "disable_web_page_preview": "true"}
+        if page.get("id"):
+            try:
+                tg("editMessageText", dict(payload, message_id=page["id"]))
+            except RuntimeError as exc:
+                if "message to edit not found" in str(exc).lower():
+                    page.pop("id", None)
+                elif "message is not modified" not in str(exc).lower():
+                    raise
+        if not page.get("id"):
+            result = tg("sendMessage", dict(payload, message_thread_id=thread, disable_notification="true"))
+            page["id"] = result["message_id"]
+        page["hash"] = checksum
+        save_state(state)
+        time.sleep(TG_SEND_INTERVAL)
+        return page["id"]
+
+    links = {}
+    for key, text in parts:
+        chunks = split_html(text, TG_LIMIT - 100)
+        messages = [update(key, i, chunk) for i, chunk in enumerate(chunks)]
+        links[key] = [plans_link(thread, message) for message in messages]
+        for i in range(len(chunks), len(current["pages"][key])):
+            update(key, i, f'Раздел стал короче. <a href="{links[key][0]}">Актуальный список</a>.')
+    # Если раздел опустел, старые записи больше не должны выглядеть актуальными.
+    for key, pages in list(current["pages"].items()):
+        if key not in links and key != "index":
+            for i in range(len(pages)):
+                update(key, i, f'В этом разделе сейчас нет задач. <a href="{coordination.WEB}/tasks">Карточки моста</a>.')
+    update("index", 0, coordination.overview(data, links))
+    current.update({"tasks_tree": source["tasks_tree"], "release": latest, "view_version": coordination.VIEW_VERSION})
+    save_state(state)
+
+
 # ---------- Наработки (outbox) ----------
 
 def watch_outbox() -> None:
@@ -445,11 +519,31 @@ def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     load_dotenv()
     parser = argparse.ArgumentParser(description="Бот группы L2Hub в Telegram")
-    parser.add_argument("mode", choices=["watch", "digest", "outbox", "init", "topics"])
+    parser.add_argument("mode", choices=["watch", "digest", "outbox", "init", "topics", "plans"])
     parser.add_argument("--dry-run", action="store_true", help="ничего не отправлять, показать в журнале")
+    parser.add_argument("--json", action="store_true", help="plans: структурированный снимок для агентов")
+    parser.add_argument("--find", default="", help="plans: поиск существующих работ")
+    parser.add_argument("--chronicle", default="", help="plans: целевая хроника первой; источники других хроник сохраняются")
     args = parser.parse_args()
     DRY = args.dry_run
     state = load_state()
+    if args.mode == "plans":
+        git("fetch", "origin", "-q")  # обновляем ref без переключения и изменения чужой рабочей папки
+        cards, source = coordination.read_snapshot(BRIDGE_DIR)
+        latest = state.get("release", "")
+        try:
+            latest = release_tags()[-1]
+        except (subprocess.SubprocessError, IndexError):
+            source["release_from_last_run"] = True
+        data = coordination.report(cards, source, latest, args.find, args.chronicle)
+        if args.json:
+            print(json.dumps(data, ensure_ascii=False, indent=2))
+        else:
+            print(f"Карточек: {len(data['cards'])}. Источник: {source['commit']} ({source['ref']}).")
+            for _, text in coordination.sections(data):
+                print(text + "\n")
+            print(data["notice"])
+        return
     if args.mode == "topics":
         show_topics()
         return
@@ -466,7 +560,8 @@ def main() -> None:
         post_digest(state)
         return
     failed = False
-    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state)), ("сводка", lambda: maybe_digest(state))):
+    for name, step in (("релизы", lambda: watch_releases(state)), ("мост", lambda: watch_bridge(state)),
+                       ("сводка", lambda: maybe_digest(state)), ("планы", lambda: sync_plans(state))):
         try:
             step()
         except Exception as exc:  # одна сломанная часть не мешает остальным
