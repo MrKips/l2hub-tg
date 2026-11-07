@@ -1,6 +1,6 @@
 {
  "release": "v0.5.238",
- "bridge": "4f71452bd56831f43b80d852479b83e5b66e8f4d",
+ "bridge": "401d48850a599bd1510b939b6e52958e028d2234",
  "digest": {
   "day": "2026-11-07",
   "released": [
@@ -156,11 +156,11 @@
    "index": [
     {
      "id": 1288,
-     "hash": "09d5eede49c09db110b3d64e732ff8438df7469b4aaf0ae6bba6996bd3f7722b"
+     "hash": "8a5b740e43319f9de37f00618961b4c7895d156ee5d5237ee4a2d4731a2d97a7"
     }
    ]
   },
-  "tasks_tree": "42daa15d6d4ec9903b23466eccd30eb308fab510",
+  "tasks_tree": "ad43b3814b101fa35f33b51f7a67181104dce5bd",
   "release": "v0.5.238",
   "view_version": 1
  }
