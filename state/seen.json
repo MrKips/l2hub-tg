@@ -1,6 +1,6 @@
 {
  "release": "v0.5.238",
- "bridge": "21f42b845d924b4db21487634ec2c2346ec229be",
+ "bridge": "3dc512ef68426deaf89218074f3fd6c3d0edef4c",
  "digest": {
   "day": "2026-11-06",
   "released": [
@@ -86,5 +86,65 @@
    "ep-previous-delivery",
    "ep-source-handoff-20261105"
   ]
+ },
+ "plans": {
+  "route": "b5240b52fcbfc9828d834d9a6c727da5210e682eb02ff72d52aa9e06393120cb",
+  "pages": {
+   "work": [
+    {
+     "id": 1280,
+     "hash": "ee58d1f66634fdaf374d22c7f908e68a731ae3572fa21d58b4e461644398f0d8"
+    }
+   ],
+   "plan": [
+    {
+     "id": 1281,
+     "hash": "3e6ff6a69c2d2eee5fe5e636834d1b7d2ee6084c5320f49131bad3410971c3fd"
+    }
+   ],
+   "local": [
+    {
+     "id": 1282,
+     "hash": "5762d2f0ca41bc9c740e8c2666d54b776ff7734fe53042255636163e3c197e5f"
+    },
+    {
+     "id": 1283,
+     "hash": "a9d57f51cebf66c6db2a101a5f7072ce71bd24e3272b92880f70b3898cfff57f"
+    }
+   ],
+   "accepted": [
+    {
+     "id": 1284,
+     "hash": "7e0da1bc2f1fb571bfa498d89824222a5aec27ae4479e61d0b23d07b5dcd0d06"
+    }
+   ],
+   "released": [
+    {
+     "id": 1285,
+     "hash": "9678006b7b0990c29b3c3766fff548f32c154db7245896fc68c0e55cb0ba78ef"
+    }
+   ],
+   "organisation": [
+    {
+     "id": 1286,
+     "hash": "b6555e289930ec105a1961c2606c79a0739539d8ac6b75ffd752efa4983843e1"
+    }
+   ],
+   "attention": [
+    {
+     "id": 1287,
+     "hash": "d0dbe329c4acdc14b30d64e7e0eeb18c6e2e2c1bc7efb4b2f3940263613af640"
+    }
+   ],
+   "index": [
+    {
+     "id": 1288,
+     "hash": "97c20354e4e34202ec3f537ffdd9cd9328cdc0db41e44ce2b64d610bc8515158"
+    }
+   ]
+  },
+  "tasks_tree": "180ea35d6fcdae298559d2e8109a7e877a71566b",
+  "release": "v0.5.238",
+  "view_version": 1
  }
 }
