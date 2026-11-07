@@ -28,6 +28,7 @@ from pathlib import Path
 import requests
 
 from telegram_html import split_html
+from system_text import describe
 
 ROOT = Path(__file__).resolve().parent
 STATE = ROOT / "state" / "seen.json"
@@ -242,7 +243,7 @@ def watch_bridge(state: dict) -> None:
         return
     changed = git("diff", "--name-status", last, head).splitlines()
     who = ", ".join(dict.fromkeys(a for a in git("log", "--format=%an", f"{last}..{head}").splitlines() if a.strip()))
-    news, tasks = [], []
+    news, tasks, task_cards = [], [], []
     for row in changed:
         parts = row.split("\t")
         status, path = parts[0], parts[-1]
@@ -250,28 +251,47 @@ def watch_bridge(state: dict) -> None:
             text = show(head, path)
             title = next((l[2:] for l in text.splitlines() if l.startswith("# ")), path)
             what = next((l.split(":**", 1)[1].strip() for l in text.splitlines() if l.startswith("**Что изменилось:**")), "")
-            news.append(f"📰 <b>{esc(title)}</b>\n{esc(what[:500])}\n<a href=\"{BRIDGE_WEB}/{path}\">читать</a>")
+            canonical = f"📰 <b>{esc(title)}</b>\n{esc(what[:500])}\n<a href=\"{BRIDGE_WEB}/{path}\">читать</a>"
+            news.append({"source": {"kind": "news", "title": title, "details": text[:7000]}, "path": path, "canonical": canonical})
         elif path.startswith("tasks/") and path.endswith(".md"):
             new, old = front(show(head, path)), front(show(last, path)) if not status.startswith("A") else {}
             name = Path(path).stem
             if not old:
                 tasks.append(f"➕ <b>{esc(name)}</b> — {esc(new.get('title', ''))} ({esc(new.get('status', '?'))}, {esc(new.get('who', '—'))})")
-            elif (old.get("status"), old.get("who")) != (new.get("status"), new.get("who")):
+                task_cards.append((name, new))
+            elif (old.get("status"), old.get("who"), old.get("release")) != (new.get("status"), new.get("who"), new.get("release")):
                 tasks.append(f"🔁 <b>{esc(name)}</b>: {esc(old.get('status', '?'))} → {esc(new.get('status', '?'))}"
                              + (f" ({esc(new.get('who'))})" if new.get("who") not in (None, "—") else ""))
-    def deliver(text: str) -> None:
+                task_cards.append((name, new))
+
+    shown_cards = task_cards[:10]
+    copies = describe([item["source"] for item in news] + [{"kind": "task", "title": card.get("title", name)} for name, card in shown_cards], ask_llm)
+
+    def deliver(text: str, canonical: str) -> None:
         # Сохраняем каждую принятую новость: после сбоя продолжаем, а не повторяем всю пачку.
-        key = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        # Ключ от исходных данных: другой пересказ при повторе не создаёт дубль.
+        key = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         if key in state.get("bridge_sent", []):
             return
         post("SYSTEM", text)
         state.setdefault("bridge_sent", []).append(key)
         save_state(state)
 
-    for text in news:
-        deliver(text)
+    for item, copy in zip(news, copies):
+        text = f"📰 <b>{esc(copy['title'])}</b>\n\n{esc(copy['summary'])}\n\n<a href=\"{BRIDGE_WEB}/{item['path']}\">Подробности и проверка</a>"
+        deliver(text, item["canonical"])
     if tasks:
-        deliver(f"🔧 Мост{(' · ' + esc(who)) if who else ''}:\n" + "\n".join(tasks[:25]) + (f"\n…и ещё {len(tasks) - 25}" if len(tasks) > 25 else ""))
+        lines = ["🛠 <b>Что с работой команды</b>"]
+        for (name, card), copy in zip(shown_cards, copies[len(news):]):
+            author = WHO.get(card.get("who", ""), card.get("who", "автор не указан"))
+            scope = f" · {card['chronicle']}" if card.get("chronicle") else ""
+            lines += ["", f"• <b>{esc(copy['title'])}</b>", esc(task_status(card, state.get("release", ""))),
+                      f"{esc(author + scope)} · <a href=\"{BRIDGE_WEB}/tasks/{name}.md\">подробнее</a>"]
+        if len(task_cards) > len(shown_cards):
+            lines += ["", f"Ещё изменений в списке задач: {len(task_cards) - len(shown_cards)}."]
+        lines += ["", f"<a href=\"{BRIDGE_WEB}/tasks\">Все задачи команды</a>"]
+        canonical = f"🔧 Мост{(' · ' + esc(who)) if who else ''}:\n" + "\n".join(tasks[:25]) + (f"\n…и ещё {len(tasks) - 25}" if len(tasks) > 25 else "")
+        deliver("\n".join(lines), canonical)
     state["bridge"] = head
     state.pop("bridge_sent", None)
     save_state(state)
@@ -315,10 +335,28 @@ def digest_buckets(tasks: dict, latest: str) -> dict[str, list[str]]:
     return out
 
 
-def task_line(name: str, t: dict) -> str:
+def task_status(t: dict, latest: str) -> str:
+    """Готовность по полям моста и выпущенному тегу; нейросеть её не определяет."""
+    release = t.get("release", "").strip()
+    if VERSION_RE.fullmatch(release):
+        if VERSION_RE.fullmatch(latest):
+            return f"✅ Включено в опубликованную версию {release}." if version_key(release) <= version_key(latest) else f"📦 Принято для версии {release}; её выпуска ещё ждём."
+        return f"Назначена версия {release}; её публикация пока не проверена."
+    return {"в работе": "🛠 Над этим сейчас работают.", "готово": "🧪 Автор закончил работу; включение в общий выпуск пока не подтверждено.",
+            "план": "💡 Пока это план, работа ещё не начата.", "свободна": "🙋 Задача ждёт исполнителя.",
+            "брошена": "⏸ Работу по этой теме остановили."}.get(t.get("status"), "Текущий статус автором не указан.")
+
+
+def task_line(name: str, t: dict, title: str | None = None) -> str:
     who = WHO.get(t.get("who", ""), t.get("who", "—"))
     release = t.get("release", "").strip()
-    return f"• {esc(t['title'])} — {esc(who)}" + (f" ({esc(release)})" if VERSION_RE.match(release) else "") + f" <a href=\"{BRIDGE_WEB}/tasks/{name}.md\">›</a>"
+    scope = f" · {esc(t['chronicle'])}" if t.get("chronicle") else ""
+    return f"• {esc(title or t['title'])} — {esc(who)}{scope}" + (f" ({esc(release)})" if VERSION_RE.match(release) else "") + f" <a href=\"{BRIDGE_WEB}/tasks/{name}.md\">подробнее</a>"
+
+
+def coordination_task(t: dict) -> bool:
+    title = t.get("title", "").lower()
+    return any(part in title for part in ("реестр", "порядок работы", "все незавершённые", "передача полного исходного", "локальных id", "сопровождение gracia"))
 
 
 def post_digest(state: dict) -> None:
@@ -329,21 +367,30 @@ def post_digest(state: dict) -> None:
     new_released = [n for n in now["released"] if n not in prev.get("released", [])] if prev else []
     new_done = [n for n in now["done"] if n not in prev.get("done", [])] if prev else []
     day = digest_day()
-    lines = [f"📋 <b>Сводка по мосту</b> · {day:%d.%m} · сборка {esc(latest)}"]
-    if new_released:
-        lines += ["", "🆕 <b>Вошло в сборку</b> (своё можно убирать из модулей):", *(task_line(n, tasks[n]) for n in new_released)]
-    if now["accepted"]:
-        lines += ["", "✅ <b>Принято, выйдет позже:</b>", *(task_line(n, tasks[n]) for n in now["accepted"])]
-    if now["work"]:
-        lines += ["", "🔨 <b>В работе:</b>", *(task_line(n, tasks[n]) for n in now["work"])]
+    game_work = [n for n in now["work"] if not coordination_task(tasks[n])]
+    sections = [("🆕 <b>Появилось в выпущенных версиях</b> — доступно после обновления:", new_released),
+                ("📦 <b>Принято, но ещё не выпущено:</b>", now["accepted"]),
+                ("🛠 <b>Над чем сейчас работают:</b>", game_work),
+                ("🧪 <b>Авторы закончили, включение в общий выпуск ещё не подтверждено:</b>", new_done)]
+    shown = list(dict.fromkeys(n for _, names in sections for n in names[:8]))
+    copies = dict(zip(shown, describe([{"kind": "task", "title": tasks[n]["title"]} for n in shown], ask_llm)))
+    lines = [f"📋 <b>Что нового и над чем работают</b> · {day:%d.%m}", f"Последняя опубликованная версия L2Hub: <b>{esc(latest)}</b>."]
+    for heading, names in sections:
+        if names:
+            lines += ["", heading, *(task_line(n, tasks[n], copies[n]["title"]) for n in names[:8])]
+            if len(names) > 8:
+                lines.append(f"Ещё тем в этом разделе: {len(names) - 8}. Полный список — по ссылке ниже.")
+    coordination = len(now["work"]) - len(game_work)
+    if coordination:
+        lines += ["", f"Ещё {coordination} записей — организация работы и учёт задач."]
     per = {}
     for n in now["done"]:
         who = WHO.get(tasks[n].get("who", ""), tasks[n].get("who", "—"))
         per[who] = per.get(who, 0) + 1
-    lines += ["", f"📦 <b>Готово, версия не указана:</b> {len(now['done'])}" + (" (" + ", ".join(f"{esc(w)} {c}" for w, c in per.items()) + ")" if per else "")]
-    lines += [task_line(n, tasks[n]) for n in new_done]
+    lines += ["", f"Всего у авторов готово тем без подтверждённого общего выпуска: {len(now['done'])}." + (" По авторам: " + ", ".join(f"{esc(w)} — {c}" for w, c in per.items()) + "." if per else "")]
     if not now["released"] and not now["accepted"]:
-        lines += ["", "<i>Строку release: в задачах пока никто не пишет — «в сборке» и «принято» появятся, когда начнут.</i>"]
+        lines += ["", "<i>По записям команды пока нельзя подтвердить, какие из этих тем вошли в общий выпуск.</i>"]
+    lines += ["", f"<a href=\"{BRIDGE_WEB}/tasks\">Все задачи и технические подробности</a>"]
     post("SYSTEM", "\n".join(lines))
     state["digest"] = {"day": f"{day:%Y-%m-%d}", "released": now["released"], "done": now["done"]}
     save_state(state)

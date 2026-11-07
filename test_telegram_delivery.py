@@ -17,6 +17,11 @@ def response(body, status=200):
 
 
 class DeliveryTests(unittest.TestCase):
+    def setUp(self):
+        offline = patch.object(bot, "ask_llm", return_value=None)
+        offline.start()
+        self.addCleanup(offline.stop)
+
     def test_retry_after_is_respected_and_success_returned(self):
         limited = response({"ok": False, "error_code": 429, "parameters": {"retry_after": 12}}, 429)
         ok = response({"ok": True, "result": {"message_id": 10}})

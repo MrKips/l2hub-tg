@@ -16,6 +16,11 @@ def plain(text):
 
 
 class HtmlMessagesTests(unittest.TestCase):
+    def setUp(self):
+        offline = patch.object(bot, "ask_llm", return_value=None)
+        offline.start()
+        self.addCleanup(offline.stop)
+
     def assert_chunks(self, source, limit=3900):
         chunks = split_html(source, limit)
         for chunk in chunks:
@@ -93,7 +98,7 @@ class HtmlMessagesTests(unittest.TestCase):
         before = {"digest": {"day": "2020-01-01", "released": [], "done": []}}
         with patch.dict(os.environ, {"TG_CHAT_ID": "test"}), patch.object(bot, "DRY", False), \
                 patch.object(bot, "bridge_tasks", return_value=tasks), patch.object(bot, "release_tags", return_value=["v0.5.205"]), \
-                patch.object(bot, "save_state") as save, patch.object(bot.time, "sleep"):
+                patch.object(bot, "save_state") as save, patch.object(bot.time, "sleep"), patch.object(bot, "TG_LIMIT", 400):
             state = copy.deepcopy(before)
             with patch.object(bot, "tg", side_effect=[{}, RuntimeError("temporary failure")]):
                 with self.assertRaises(RuntimeError):
