@@ -1,8 +1,8 @@
 {
  "release": "v0.5.238",
- "bridge": "756f231750db5dab798e2ad39521289454568227",
+ "bridge": "acc07d4484918060a28897ea77a8d81cd1de7a6c",
  "digest": {
-  "day": "2026-11-07",
+  "day": "2026-11-08",
   "released": [
    "board-karma",
    "board-raid-status",
@@ -39,17 +39,23 @@
    "store-close"
   ],
   "done": [
+   "ep-altb-buffer-pet-layout-overflow",
+   "ep-auto-ls-navigation",
    "ep-autolearn-skill-level-downgrade",
    "ep-chat-bank-runtime",
    "ep-chat-bank-terra-v119-integration",
    "ep-clan-recruitment-after-dismissal-penalty",
+   "ep-clan-subunit-roster-client-display-mismatch",
    "ep-clan-war-personal-companion-targets",
    "ep-cross-clan-applications",
    "ep-enchant",
    "ep-gmshop-icarus-pvp-370-col",
    "ep-gmshop-noblesse-reagents",
+   "ep-gmshop-potions-page",
    "ep-gmshop-pvp-armor-cheaper-than-base",
    "ep-gmshop-soul-bottles",
+   "ep-gmshop-territory-flags",
+   "ep-gmshop-tw-jewels-to-epic",
    "ep-latest-local-package",
    "ep-local-b06",
    "ep-local-b07",
@@ -82,23 +88,30 @@
    "ep-olympiad-next-cycle-midnight",
    "ep-olympiad-opponent-class",
    "ep-olympiad-pregame-movement",
+   "ep-olympiad-ranged-skills-while-chasing",
    "ep-olympiad-relog-current-player",
    "ep-olympiad-repeated-pvp-chat",
+   "ep-olympiad-scheduler-capacity",
    "ep-olympiad-servitor-idle",
    "ep-olympiad-sitting-fake-death",
    "ep-olympiad-solo-party-heal-conditionally-omitted",
+   "ep-olympiad-target-recovery",
    "ep-olympiad-token-reward-scale",
    "ep-paid-carry-weight",
+   "ep-paid-prophecy-buff-enchant-15",
    "ep-party-noblesse",
    "ep-pawn-mp-prechecks",
    "ep-pawn-spot-overflow",
    "ep-personal-archer-support",
+   "ep-personal-companion-owner-progression-sync",
+   "ep-personal-party-clan-free-subunits-not-used",
    "ep-personal-real-target",
    "ep-personal-skill-reagents",
    "ep-player-auto-enchant",
    "ep-player-auto-life-stones",
    "ep-previous-delivery",
    "ep-shortcut-autoshot-state",
+   "ep-sieges",
    "ep-source-handoff-20261105",
    "ep-titles",
    "x10-hub-controls"
@@ -110,23 +123,23 @@
    "work": [
     {
      "id": 1280,
-     "hash": "1da24612f9bf8f1f31235f68d0d2e1324b3745b928e5fc2f0f96d6e5992a63b1"
+     "hash": "372e61a86a65d7606b4b97ee9de0141c92c18264dbb0309cacf138a69ee4e2d1"
     }
    ],
    "plan": [
     {
      "id": 1281,
-     "hash": "23376e3e30b5fa54597d876a87c17e1ee2237a355885be0ad2f9970677e2a9f7"
+     "hash": "74c73a78fa2b3fbc57526dd6b65915e811b6b723dd58bb2640be53448502d625"
     }
    ],
    "local": [
     {
      "id": 1282,
-     "hash": "c2ee35df0bb0cc7123f501d140891eb61ee81c9a35cd8cbbc69ccb9f045f42c6"
+     "hash": "e8c9749bc38378e9f608c90fc9f1caad375fcbb21252c1130d2a4c57b00555e5"
     },
     {
      "id": 1283,
-     "hash": "6982b5f48a5144122b43901cbfc26b60e7ea0c3448fb096f77370205d25b4a08"
+     "hash": "a9ed6b04e8902e013536511c80a7784b089c5b85dc30d1272157f2f39eacf562"
     }
    ],
    "accepted": [
@@ -150,17 +163,17 @@
    "attention": [
     {
      "id": 1287,
-     "hash": "8f8b0f97448fe154245510f2e9c0da9a9d39d678f4f4798f333e46af090ccef1"
+     "hash": "fcd33c9693ded1b4d6168a928e9d75bd0c23903315098636c6a582bb02253301"
     }
    ],
    "index": [
     {
      "id": 1288,
-     "hash": "0cb899839b582487bd486c146de5d6d7c8db0f6e66b85bc34479d2115c0c292e"
+     "hash": "d12aaaa771103867698167de9bb4924e7e9afdf286c3c54cf1d9dda1bc0feb31"
     }
    ]
   },
-  "tasks_tree": "78d551cc7a17866ff482243768aa982152800d75",
+  "tasks_tree": "eb134142b1bd31fe8e4e762aa6ce3b6586b4cfbd",
   "release": "v0.5.238",
   "view_version": 1
  }
