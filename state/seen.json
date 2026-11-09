@@ -1,8 +1,8 @@
 {
  "release": "v0.5.286",
- "bridge": "d5ff9d08b15e75a477e4c31cf973bb5819038fba",
+ "bridge": "7c6ac3a29e0c0e732b2d4ec5365a598d7310f7eb",
  "digest": {
-  "day": "2026-11-08",
+  "day": "2026-11-09",
   "released": [
    "board-karma",
    "board-raid-status",
@@ -11,6 +11,7 @@
    "chat-bank",
    "clan-priority",
    "clan-savings",
+   "companions-any-class",
    "debuff-removal",
    "ep-class-kits",
    "ep-hunter-price-parity",
@@ -20,15 +21,19 @@
    "ep-olympiad-last-points-cursor",
    "ep-olympiad-positive-hp-knockout",
    "gm-shop-editor",
+   "h5-dead-companions-stranded",
    "hunter-craft",
    "hunter-kamaloka",
    "hunter-learning",
+   "hunter-lifecycle",
    "hunter-mentors",
    "hunter-party-matching",
    "hunter-pets",
    "hunter-rift",
+   "hunter-skill",
    "hunter-spoil",
    "hunters-500",
+   "local-llm",
    "machine-estimate",
    "mode-x10",
    "noblesse",
@@ -36,10 +41,12 @@
    "restart-reminder",
    "russian-dialogs",
    "shop-price-stubs",
-   "store-close"
+   "store-close",
+   "veteran-switch"
   ],
   "done": [
    "ep-altb-buffer-pet-layout-overflow",
+   "ep-altb-personal-controls",
    "ep-auto-ls-navigation",
    "ep-autolearn-skill-level-downgrade",
    "ep-chat-bank-runtime",
@@ -48,6 +55,8 @@
    "ep-clan-subunit-roster-client-display-mismatch",
    "ep-clan-war-personal-companion-targets",
    "ep-cross-clan-applications",
+   "ep-custom-olympiad-points-aware-matchmaking",
+   "ep-direction",
    "ep-enchant",
    "ep-gmshop-icarus-pvp-370-col",
    "ep-gmshop-noblesse-reagents",
@@ -56,6 +65,7 @@
    "ep-gmshop-soul-bottles",
    "ep-gmshop-territory-flags",
    "ep-gmshop-tw-jewels-to-epic",
+   "ep-index",
    "ep-latest-local-package",
    "ep-local-b06",
    "ep-local-b07",
@@ -75,18 +85,21 @@
    "ep-local-h06",
    "ep-local-h09",
    "ep-local-h10",
+   "ep-local-m03",
    "ep-native-source",
    "ep-olympiad-arena1-navigation",
    "ep-olympiad-aura-self-defence-omitted",
    "ep-olympiad-continuous",
    "ep-olympiad-countdowns",
    "ep-olympiad-delays-between-actions",
+   "ep-olympiad-excessive-queue-wait-starvation",
    "ep-olympiad-first-action-delay",
    "ep-olympiad-gates-stay-closed",
    "ep-olympiad-learned-self-heals-omitted",
    "ep-olympiad-mage-participation-audit",
    "ep-olympiad-next-cycle-midnight",
    "ep-olympiad-opponent-class",
+   "ep-olympiad-post-win-return-delay",
    "ep-olympiad-pregame-movement",
    "ep-olympiad-ranged-skills-while-chasing",
    "ep-olympiad-relog-current-player",
@@ -97,6 +110,7 @@
    "ep-olympiad-solo-party-heal-conditionally-omitted",
    "ep-olympiad-target-recovery",
    "ep-olympiad-token-reward-scale",
+   "ep-open-work",
    "ep-paid-carry-weight",
    "ep-paid-prophecy-buff-enchant-15",
    "ep-party-noblesse",
@@ -110,10 +124,20 @@
    "ep-player-auto-enchant",
    "ep-player-auto-life-stones",
    "ep-previous-delivery",
+   "ep-queen-ant-curse-entry-zone",
    "ep-shortcut-autoshot-state",
    "ep-sieges",
+   "ep-soulbreaker-wields-sword-instead-of-rapier",
    "ep-source-handoff-20261105",
+   "ep-status-bugs",
+   "ep-status-custom",
+   "ep-status-development",
+   "ep-status-local-ids",
+   "ep-status",
    "ep-titles",
+   "ep-zone-membership-race",
+   "epilogue-maintenance",
+   "hunter-dyes",
    "x10-hub-controls"
   ]
  },
@@ -123,23 +147,23 @@
    "work": [
     {
      "id": 1280,
-     "hash": "1e53cc074ab50b9ce1853c832ca94eff73442361a0c07d698d5f0f2dd7d97d3b"
+     "hash": "f67c078d7a92e2d1732faa3cc48dafc60e9b64965bc6ef1a14b92a59d36c2564"
     }
    ],
    "plan": [
     {
      "id": 1281,
-     "hash": "ed4f1614d1134f81fed0f6b134085f17a07b314fa7fa23cfdf571914db926cdc"
+     "hash": "a296b4ad8fa9a43efbdd777b0dc242d1ee33c5b92fb18d2516a0e303d22e918f"
     }
    ],
    "local": [
     {
      "id": 1282,
-     "hash": "edca0b4901619721377c4a515397c8535bed48f9c1130f76d9135361f6832103"
+     "hash": "785a7c7bd3af7c5417588a0efd991daec08bc4aa56d5a959d30e6e6b3f9c99ff"
     },
     {
      "id": 1283,
-     "hash": "fea35e036ad5bfe8c28f9888d071be47a73e602d8966870fa37298255a089481"
+     "hash": "db0e3f5e0e8d9492159b1bc97db4ae4aea14339beda64276b8b01fce62e8217f"
     }
    ],
    "accepted": [
@@ -163,13 +187,13 @@
    "attention": [
     {
      "id": 1287,
-     "hash": "e8467eefe6159c2da0f9358730ef08a0b1d3cb89e6ef1bd3113f45a32d12b17d"
+     "hash": "423e69daa1d6230a718afde080e00b42296a6f3b5f8de9da9c54e2423adbccc9"
     }
    ],
    "index": [
     {
      "id": 1288,
-     "hash": "0b8955776b1affaba965af8e39a0a3a71fa51a7a9b8fb6a15b72948806a0a439"
+     "hash": "e254afca79a1523d3124fbfacc6a5efad4887ad433aac589a3b5a3c0a4765774"
     }
    ],
    "stopped": [
@@ -179,7 +203,7 @@
     }
    ]
   },
-  "tasks_tree": "701056abb859203a1dfa26ed10c1a9ff02365f25",
+  "tasks_tree": "38a7256616998619fe06f1555bef18bb3134135b",
   "release": "v0.5.286",
   "view_version": 1
  }
