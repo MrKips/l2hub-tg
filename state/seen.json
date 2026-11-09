@@ -1,6 +1,6 @@
 {
  "release": "v0.5.286",
- "bridge": "6e648f3707157d7fef8e427f172d395e725129c6",
+ "bridge": "d5ff9d08b15e75a477e4c31cf973bb5819038fba",
  "digest": {
   "day": "2026-11-08",
   "released": [
@@ -123,35 +123,35 @@
    "work": [
     {
      "id": 1280,
-     "hash": "372e61a86a65d7606b4b97ee9de0141c92c18264dbb0309cacf138a69ee4e2d1"
+     "hash": "1e53cc074ab50b9ce1853c832ca94eff73442361a0c07d698d5f0f2dd7d97d3b"
     }
    ],
    "plan": [
     {
      "id": 1281,
-     "hash": "74c73a78fa2b3fbc57526dd6b65915e811b6b723dd58bb2640be53448502d625"
+     "hash": "ed4f1614d1134f81fed0f6b134085f17a07b314fa7fa23cfdf571914db926cdc"
     }
    ],
    "local": [
     {
      "id": 1282,
-     "hash": "e8c9749bc38378e9f608c90fc9f1caad375fcbb21252c1130d2a4c57b00555e5"
+     "hash": "edca0b4901619721377c4a515397c8535bed48f9c1130f76d9135361f6832103"
     },
     {
      "id": 1283,
-     "hash": "a9ed6b04e8902e013536511c80a7784b089c5b85dc30d1272157f2f39eacf562"
+     "hash": "fea35e036ad5bfe8c28f9888d071be47a73e602d8966870fa37298255a089481"
     }
    ],
    "accepted": [
     {
      "id": 1284,
-     "hash": "864405e6fc109ff7c3fdd85be53b543a7e24edcfe4eeb1db37ce491b1fa0de5c"
+     "hash": "a00bda36bbb5cda15c512facd5644d0ee97519b80597942ab1b237f0d9401d71"
     }
    ],
    "released": [
     {
      "id": 1285,
-     "hash": "eaa5ebaaaf91a36bfa10931b36140a909624db650f0ee5d309f8193524c33060"
+     "hash": "94676c325e8168f17612b6002aa96e656d1322469ff1d95c014c029072e8f07e"
     }
    ],
    "organisation": [
@@ -163,17 +163,23 @@
    "attention": [
     {
      "id": 1287,
-     "hash": "fcd33c9693ded1b4d6168a928e9d75bd0c23903315098636c6a582bb02253301"
+     "hash": "e8467eefe6159c2da0f9358730ef08a0b1d3cb89e6ef1bd3113f45a32d12b17d"
     }
    ],
    "index": [
     {
      "id": 1288,
-     "hash": "d2b4d50f5e3c0ee37016cc68af3abbf952a2b34821ad373583726c5c7309af6b"
+     "hash": "0b8955776b1affaba965af8e39a0a3a71fa51a7a9b8fb6a15b72948806a0a439"
+    }
+   ],
+   "stopped": [
+    {
+     "id": 1682,
+     "hash": "6db8ddfdfde28ac02f54165a9f45defb78e24479dd1ac818d16bb2a82decce19"
     }
    ]
   },
-  "tasks_tree": "2ab1ed54c3f947f2e6d32a6f4b2ad1b3ab216150",
+  "tasks_tree": "701056abb859203a1dfa26ed10c1a9ff02365f25",
   "release": "v0.5.286",
   "view_version": 1
  }
