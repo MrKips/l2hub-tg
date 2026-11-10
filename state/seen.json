@@ -2,7 +2,7 @@
  "release": "v0.5.286",
  "bridge": "c3586967e4e0ea52829ea102a03b6b4fd2cc76a7",
  "digest": {
-  "day": "2026-11-09",
+  "day": "2026-11-10",
   "released": [
    "board-karma",
    "board-raid-status",
