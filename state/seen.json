@@ -2,7 +2,7 @@
  "release": "v1.0.0",
  "bridge": "c3586967e4e0ea52829ea102a03b6b4fd2cc76a7",
  "digest": {
-  "day": "2026-11-15",
+  "day": "2026-11-16",
   "released": [
    "board-karma",
    "board-raid-status",
@@ -21,6 +21,7 @@
    "ep-olympiad-last-points-cursor",
    "ep-olympiad-positive-hp-knockout",
    "gm-shop-editor",
+   "h5-companions-res-conflict",
    "h5-dead-companions-stranded",
    "hunter-craft",
    "hunter-kamaloka",
