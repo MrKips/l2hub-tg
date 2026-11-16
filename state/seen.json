@@ -1,5 +1,5 @@
 {
- "release": "v0.5.286",
+ "release": "v1.0.0",
  "bridge": "c3586967e4e0ea52829ea102a03b6b4fd2cc76a7",
  "digest": {
   "day": "2026-11-15",
@@ -169,13 +169,13 @@
    "accepted": [
     {
      "id": 1284,
-     "hash": "a00bda36bbb5cda15c512facd5644d0ee97519b80597942ab1b237f0d9401d71"
+     "hash": "864405e6fc109ff7c3fdd85be53b543a7e24edcfe4eeb1db37ce491b1fa0de5c"
     }
    ],
    "released": [
     {
      "id": 1285,
-     "hash": "94676c325e8168f17612b6002aa96e656d1322469ff1d95c014c029072e8f07e"
+     "hash": "eb16df03a5bb7bed763d00419021dd611cc2efd0522681b3ca7ae16733778393"
     }
    ],
    "organisation": [
@@ -193,7 +193,7 @@
    "index": [
     {
      "id": 1288,
-     "hash": "e254afca79a1523d3124fbfacc6a5efad4887ad433aac589a3b5a3c0a4765774"
+     "hash": "d1ba7d29a3f632c0ba1091637595868c2f226f120c00071b749084955a3c8da9"
     }
    ],
    "stopped": [
@@ -204,7 +204,7 @@
    ]
   },
   "tasks_tree": "38a7256616998619fe06f1555bef18bb3134135b",
-  "release": "v0.5.286",
+  "release": "v1.0.0",
   "view_version": 1
  }
 }
