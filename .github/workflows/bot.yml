@@ -45,7 +45,6 @@ jobs:
         env:
           BRIDGE_DIR: ${{ runner.temp }}/bridge
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           TG_TOPIC_UPDATES: ${{ secrets.TG_TOPIC_UPDATES }}
           TG_TOPIC_SYSTEM: ${{ secrets.TG_TOPIC_SYSTEM }}

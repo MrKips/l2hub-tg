@@ -12,7 +12,7 @@
   python l2hub_tg.py topics               — показать id тем группы, которые бот видел (для .env)
 
 Ключи — в .env рядом со скриптом (в git не попадает) или в секретах репозитория: TELEGRAM_BOT_TOKEN,
-LLM_API_KEY, TG_CHAT_ID и id тем; в Actions ещё BRIDGE_DEPLOY_KEY.
+TG_CHAT_ID (LLM_API_KEY — по желанию, сейчас выключен) и id тем; в Actions ещё BRIDGE_DEPLOY_KEY.
 """
 import argparse
 import hashlib
