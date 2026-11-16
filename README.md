@@ -1,5 +1,7 @@
 # Бот группы L2Hub в Telegram
 
+> **Выключен 2026-11-16.** Workflow `bot` на GitHub отключён, DeepSeek убран. Включить: `gh workflow enable bot -R MrKips/l2hub-tg` (пересказ нейросетью — только с секретом `LLM_API_KEY`).
+
 Сам пишет в группу `l2hub`, по темам:
 
 | Тема | Что пишет | Откуда берёт |
